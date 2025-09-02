@@ -33,14 +33,19 @@ export class UsersService {
     });
   }
 
-  async updateRoles(id: number, updateUserRolesDto: UpdateUserRolesDto): Promise<User> {
+  async updateRoles(
+    id: number,
+    updateUserRolesDto: UpdateUserRolesDto,
+  ): Promise<User> {
     const user = await this.findOne(id);
-    
+
     if (!user) {
       throw new Error(`User with ID ${id} not found`);
     }
 
-    const roles = await this.rolesRepository.findByIds(updateUserRolesDto.roleIds);
+    const roles = await this.rolesRepository.findByIds(
+      updateUserRolesDto.roleIds,
+    );
 
     user.roles = roles;
 

@@ -40,7 +40,10 @@ export class UsersController {
     @Body() updateUserRolesDto: UpdateUserRolesDto,
   ) {
     try {
-      return await this.usersService.updateRoles(parseInt(id, 10), updateUserRolesDto);
+      return await this.usersService.updateRoles(
+        parseInt(id, 10),
+        updateUserRolesDto,
+      );
     } catch (error) {
       throw new NotFoundException(error.message);
     }

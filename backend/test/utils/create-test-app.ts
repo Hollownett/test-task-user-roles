@@ -1,13 +1,13 @@
-import { INestApplication } from '@nestjs/common'
-import { Test, TestingModule } from '@nestjs/testing'
-import { AppModule } from '../../src/app.module'
+import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppModule } from '../../src/app.module';
 
 export async function createTestApp(): Promise<INestApplication> {
   const moduleRef: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile()
+  }).compile();
 
-  const app = moduleRef.createNestApplication()
-  await app.init()
-  return app
+  const app = moduleRef.createNestApplication();
+  await app.init();
+  return app;
 }

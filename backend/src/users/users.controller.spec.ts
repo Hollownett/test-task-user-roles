@@ -7,7 +7,6 @@ import { NotFoundException } from '@nestjs/common';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let service: UsersService;
 
   const mockUsersService = {
     create: jest.fn(),
@@ -28,7 +27,6 @@ describe('UsersController', () => {
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    service = module.get<UsersService>(UsersService);
   });
 
   it('should be defined', () => {
@@ -41,7 +39,7 @@ describe('UsersController', () => {
         email: 'test@example.com',
         name: 'Test',
       };
-      
+
       const result = { id: 1, ...createUserDto };
       mockUsersService.create.mockResolvedValue(result);
 
@@ -54,9 +52,9 @@ describe('UsersController', () => {
     it('should return an array of users', async () => {
       const result = [
         { id: 1, email: 'test1@example.com', name: 'Test1' },
-        { id: 2, email: 'test2@example.com', name: 'Test2' }
+        { id: 2, email: 'test2@example.com', name: 'Test2' },
       ];
-      
+
       mockUsersService.findAll.mockResolvedValue(result);
 
       expect(await controller.findAll()).toBe(result);
@@ -76,7 +74,9 @@ describe('UsersController', () => {
     it('should throw NotFoundException when user not found', async () => {
       mockUsersService.findOne.mockResolvedValue(null);
 
-      await expect(controller.findOne('999')).rejects.toThrow(NotFoundException);
+      await expect(controller.findOne('999')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(mockUsersService.findOne).toHaveBeenCalledWith(999);
     });
   });
@@ -86,29 +86,44 @@ describe('UsersController', () => {
       const updateUserRolesDto: UpdateUserRolesDto = {
         roleIds: [1, 2],
       };
-      
-      const result = { 
-        id: 1, 
-        email: 'test@example.com', 
-        name: 'Test', 
-        roles: [{ id: 1, name: 'Admin' }, { id: 2, name: 'User' }]
+
+      const result = {
+        id: 1,
+        email: 'test@example.com',
+        name: 'Test',
+        roles: [
+          { id: 1, name: 'Admin' },
+          { id: 2, name: 'User' },
+        ],
       };
-      
+
       mockUsersService.updateRoles.mockResolvedValue(result);
 
-      expect(await controller.updateRoles('1', updateUserRolesDto)).toBe(result);
-      expect(mockUsersService.updateRoles).toHaveBeenCalledWith(1, updateUserRolesDto);
+      expect(await controller.updateRoles('1', updateUserRolesDto)).toBe(
+        result,
+      );
+      expect(mockUsersService.updateRoles).toHaveBeenCalledWith(
+        1,
+        updateUserRolesDto,
+      );
     });
 
     it('should throw NotFoundException when update fails', async () => {
       const updateUserRolesDto: UpdateUserRolesDto = {
         roleIds: [1, 2],
       };
-      
-      mockUsersService.updateRoles.mockRejectedValue(new Error('User not found'));
 
-      await expect(controller.updateRoles('1', updateUserRolesDto)).rejects.toThrow(NotFoundException);
-      expect(mockUsersService.updateRoles).toHaveBeenCalledWith(1, updateUserRolesDto);
+      mockUsersService.updateRoles.mockRejectedValue(
+        new Error('User not found'),
+      );
+
+      await expect(
+        controller.updateRoles('1', updateUserRolesDto),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockUsersService.updateRoles).toHaveBeenCalledWith(
+        1,
+        updateUserRolesDto,
+      );
     });
   });
 });

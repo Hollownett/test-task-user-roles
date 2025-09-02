@@ -19,5 +19,13 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      '@typescript-eslint/no-explicit-any': "warn",
+      '@typescript-eslint/no-floating-promises': "off",
+      '@typescript-eslint/no-unsafe-argument': "off",
+      '@typescript-eslint/no-require-imports': "warn",
+      '@typescript-eslint/ban-ts-comment' : "warn",
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])

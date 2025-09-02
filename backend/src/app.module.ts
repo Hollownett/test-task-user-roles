@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { UsersModule } from './users/users.module'
-import { RolesModule } from './roles/roles.module'
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { RolesModule } from './roles/roles.module'
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
-        type: cfg.get<any>('DATABASE_TYPE', 'postgres'),
+        type: cfg.get<'postgres'>('DATABASE_TYPE', 'postgres'),
         host: cfg.get<string>('DATABASE_HOST'),
         port: cfg.get<number>('DATABASE_PORT'),
         username: cfg.get<string>('DATABASE_USERNAME'),
