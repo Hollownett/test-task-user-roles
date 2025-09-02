@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useUsers, useUpdateUserRoles } from '../hooks/useUsers'
 import { useRoles } from '../hooks/useRoles'
 import Dropdown from './Dropdown';

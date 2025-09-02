@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Dropdown from '../Dropdown'
