@@ -143,7 +143,7 @@ jobs:
           API_BASE_URL: http://127.0.0.1:3000
           NODE_ENV: test
         run: |
-          npx playwright test --reporter=html,line
+          npm run e2e --reporter=html,line
           # Save the HTML report path
           echo "REPORT_DIR=$(npx playwright show-report --print-location)" >> $GITHUB_ENV
 
