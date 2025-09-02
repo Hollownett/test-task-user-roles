@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { TerminusModule } from '@nestjs/terminus' 
+import { HealthModule } from './healthcheck/health.module';
 
 @Module({
   imports: [
@@ -24,8 +26,10 @@ import { RolesModule } from './roles/roles.module';
         logging: cfg.get('DATABASE_LOGGING') === 'true',
       }),
     }),
+    TerminusModule,
     UsersModule,
     RolesModule,
+    HealthModule
   ],
 })
 export class AppModule {}

@@ -103,7 +103,7 @@ jobs:
           DATABASE_LOGGING: "false"
 
       - name: Wait on backend
-        run: npx wait-on http://127.0.0.1:3000/ || npx wait-on http://localhost:3000/
+        run: npx --yes wait-on http://127.0.0.1:3000/health --timeout 90000 --interval 500
 
       # Frontend install & build
       - name: Install (frontend)
