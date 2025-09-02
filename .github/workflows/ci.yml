@@ -15,7 +15,7 @@ env:
 
 jobs:
   backend-tests:
-    name: Backend | Lint + Unit + E2E (SQLite in-memory)
+    name: Backend Build & Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -62,7 +62,7 @@ jobs:
           path: ${{ env.BACKEND_DIR }}/coverage
 
   frontend-e2e:
-    name: Frontend | Playwright E2E (Vite + Backend live)
+    name: Frontend Build & E2E
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [backend-tests]  # optional; remove if you want parallel
