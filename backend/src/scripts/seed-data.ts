@@ -1,6 +1,6 @@
 import { createConnection } from 'typeorm';
-import { User } from '../src/users/entities/user.entity';
-import { Role } from '../src/roles/entities/role.entity';
+import { User } from '../users/entities/user.entity';
+import { Role } from '../roles/entities/role.entity';
 
 async function seed() {
   const connection = await createConnection({
