@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom';
+//@ts-ignore
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import UserRoleTable from '../UserRoleTable';
 
