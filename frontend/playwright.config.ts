@@ -1,28 +1,52 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const isCI = !!process.env.CI;
+
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30 * 1000,
-  retries: 0,
-  outputDir: 'test-results/',
+  timeout: 30_000,
+  expect: { timeout: 10_000 },
   use: {
-    baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173',
+    trace: 'retain-on-failure', 
+    video: isCI ? 'retain-on-failure' : 'off',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
   },
-  projects: [
+
+  webServer: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      command: 'npm run start:prod',
+      cwd: '../backend',
+      url: 'http://127.0.0.1:3000/health/ready',
+      timeout: 120_000,
+      reuseExistingServer: true,
+      env: {
+        NODE_ENV: 'test',
+        PORT: '3000',
+        DATABASE_TYPE: 'sqlite',
+        DATABASE_DATABASE: ':memory:',
+        DATABASE_SYNCHRONIZE: 'true',
+        DATABASE_LOGGING: 'false',
+      },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      command: 'npm run preview -- --host --port 5173',
+      cwd: '.',
+      url: 'http://127.0.0.1:5173/',
+      timeout: 120_000,
+      reuseExistingServer: true,
+      env: {
+        NODE_ENV: 'test',
+        VITE_API_URL: 'http://127.0.0.1:3000',
+      },
     },
   ],
+
+  projects: isCI
+    ? [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]
+    : [
+        { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+        { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+        { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+      ],
 });

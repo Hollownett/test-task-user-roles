@@ -64,14 +64,14 @@ jobs:
   frontend-e2e:
     name: Frontend Build & E2E
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [backend-tests]  # optional; remove if you want parallel
+    timeout-minutes: 25
+    needs: [backend-tests]
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
@@ -79,37 +79,16 @@ jobs:
             ${{ env.BACKEND_DIR }}/package-lock.json
             ${{ env.FRONTEND_DIR }}/package-lock.json
 
-      # Backend install & build
       - name: Install (backend)
         working-directory: ${{ env.BACKEND_DIR }}
         run: npm ci
-
       - name: Build (backend)
         working-directory: ${{ env.BACKEND_DIR }}
-        run: npm run build --if-present
+        run: npm run build
 
-      - name: Start backend
-        working-directory: ${{ env.BACKEND_DIR }}
-        run: |
-          # Try prod first; fallback to dev if needed
-          (npm run start:prod || npm run start:dev) &
-          echo $! > backend.pid
-        env:
-          NODE_ENV: test
-          PORT: 3000
-          DATABASE_TYPE: sqlite
-          DATABASE_DATABASE: ":memory:"
-          DATABASE_SYNCHRONIZE: "true"
-          DATABASE_LOGGING: "false"
-
-      - name: Wait on backend
-        run: npx --yes wait-on http://127.0.0.1:3000/health --timeout 90000 --interval 500
-
-      # Frontend install & build
       - name: Install (frontend)
         working-directory: ${{ env.FRONTEND_DIR }}
         run: npm ci
-
       - name: Unit tests (frontend)
         working-directory: ${{ env.FRONTEND_DIR }}
         run: npm test -- --coverage
@@ -117,47 +96,23 @@ jobs:
       - name: Build (frontend)
         working-directory: ${{ env.FRONTEND_DIR }}
         env:
-          VITE_API_BASE: http://127.0.0.1:3000
+          VITE_API_URL: http://127.0.0.1:3000
         run: npm run build
 
-      - name: Start Vite preview
+      - name: Install Playwright Chromium
         working-directory: ${{ env.FRONTEND_DIR }}
-        run: |
-          npx vite preview --host --port 5173 &
-          echo $! > frontend.pid
-
-      - name: Wait on frontend
-        run: npx wait-on http://127.0.0.1:5173/ || npx wait-on http://localhost:5173/
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles(format('{0}/package-lock.json', env.FRONTEND_DIR)) }}
-      - name: Install Playwright
-        working-directory: ${{ env.FRONTEND_DIR }}
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: E2E (Playwright)
         working-directory: ${{ env.FRONTEND_DIR }}
         env:
+          CI: 'true'
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:5173
-          VITE_API_BASE_URLE_URL: http://127.0.0.1:3000
-          NODE_ENV: test
-        run: |
-          npm run e2e --reporter=html,line
-          # Save the HTML report path
-          echo "REPORT_DIR=$(npx playwright show-report --print-location)" >> $GITHUB_ENV
+        run: npx playwright test --project=chromium --reporter=line
 
-      - name: Upload Playwright report
+      - name: Upload Playwright artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: ${{ env.REPORT_DIR }}
-
-      - name: Stop services
-        if: always()
-        run: |
-          if [ -f backend.pid ]; then kill -9 $(cat backend.pid) || true; fi
-          if [ -f frontend.pid ]; then kill -9 $(cat frontend.pid) || true; fi
+          path: ${{ env.FRONTEND_DIR }}/playwright-report
