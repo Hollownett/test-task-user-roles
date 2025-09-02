@@ -142,7 +142,7 @@ jobs:
         working-directory: ${{ env.FRONTEND_DIR }}
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:5173
-          API_BASE_URL: http://127.0.0.1:3000
+          VITE_API_BASE_URLE_URL: http://127.0.0.1:3000
           NODE_ENV: test
         run: |
           npm run e2e --reporter=html,line
