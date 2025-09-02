@@ -35,7 +35,7 @@ This project contains both a React + TypeScript + Vite frontend and a NestJS bac
    ```sh
    npm run test:e2e
    ```
-   Make sure to start backend applicatin and frontend application before running frontend e2e tests.
+   Make sure to start the backend application and frontend application before running frontend e2e tests.
 
 ### Build for production
 
