@@ -1,0 +1,38 @@
+/* Minimal shadcn-inspired styles (lightweight) */
+.shad-card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+}
+
+.shad-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+.shad-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+}
+.shad-btn:disabled { opacity: 0.6; cursor: not-allowed }
+.shad-btn.ghost { background: transparent; color: #0f172a; border-color: rgba(15,23,42,0.06) }
+
+.shad-table { width: 100%; border-collapse: collapse; }
+.shad-table th, .shad-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #eef2f7 }
+.shad-table th { font-size: 0.875rem; color: #0f172a; font-weight: 600 }
+
+.shad-select { padding: 6px 8px; border-radius: 6px; border: 1px solid #e6edf3; background: #fff }
+
+.shad-loading { padding: 24px; text-align: center; color: #64748b }
