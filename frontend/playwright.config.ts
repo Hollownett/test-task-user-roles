@@ -17,7 +17,7 @@ export default defineConfig({
     {
       command: 'npm run start:prod',
       cwd: '../backend',
-      url: 'http://127.0.0.1:3000/health/ready',
+      url: 'http://127.0.0.1:3000/health',
       timeout: 120_000,
       reuseExistingServer: true,
       env: {
