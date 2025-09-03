@@ -3,7 +3,7 @@
 This project contains both a React + TypeScript + Vite frontend and a NestJS backend for role/user management.
 
 ## App view
-<img width="1873" height="982" alt="image" src="https://github.com/user-attachments/assets/fd28061f-4c6f-4017-a8ac-411c59679f3b" />
+<img width="1423" height="585" alt="image" src="https://github.com/user-attachments/assets/7122d090-23fb-4815-9b19-7049484437da" />
 
 
 ## Prerequisites
