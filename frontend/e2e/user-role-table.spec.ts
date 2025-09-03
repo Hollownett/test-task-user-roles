@@ -35,7 +35,7 @@ test.describe('UserRoleTable E2E', () => {
     const userIdMatch = await userRow.getAttribute('data-testid');
     const userId = userIdMatch?.replace('user-row-', '');
 
-    const dropdown = page.getByTestId(`user-roles-dropdown-${userId}`);
+    const dropdown = page.getByTestId(`user-roles-select-${userId}`);
     await dropdown.click();
 
     const firstOption = page.getByTestId('select-role-menu-item-1');
