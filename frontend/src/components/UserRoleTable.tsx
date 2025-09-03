@@ -125,6 +125,7 @@ const UserRoleTable = () => {
       <Table data-testid="user-role-table">
         <TableHeader>
           <TableRow>
+            <TableHead>ID</TableHead>
             <TableHead
               data-testid="column-header-name"
               onClick={() =>
@@ -154,6 +155,7 @@ const UserRoleTable = () => {
         <TableBody>
           {paged.length > 0 ? paged.map(user => (
             <TableRow key={user.id} data-testid={`user-row-${user.id}`}>
+              <TableCell data-testid={`user-id-name-${user.id}`}>{user.id}</TableCell>
               <TableCell data-testid={`user-name-${user.id}`}>{user.name}</TableCell>
               <TableCell data-testid={`user-email-${user.id}`}>{user.email}</TableCell>
               <TableCell data-testid={`user-roles-dropdown-${user.id}`} style={{ width: 300 }}>
