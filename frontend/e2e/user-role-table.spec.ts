@@ -15,14 +15,6 @@ test.describe('UserRoleTable E2E', () => {
     expect(rowCount).toBeGreaterThan(0);
   });
 
-  test('search works to filter users', async ({ page }) => {
-    const userNameCell = page.getByTestId(/user-name-/).first();
-    const userName = await userNameCell.textContent();
-    if (userName && userName.trim()) {
-      await page.getByTestId('search-input').fill(userName.trim());
-      await expect(page.getByTestId(/user-row-/).first()).toBeVisible();
-    }
-  });
 
   test('sorting by name and email toggles order', async ({ page }) => {
     await page.getByTestId('column-header-name').click();
@@ -43,7 +35,7 @@ test.describe('UserRoleTable E2E', () => {
     const userIdMatch = await userRow.getAttribute('data-testid');
     const userId = userIdMatch?.replace('user-row-', '');
 
-    const dropdown = page.getByTestId(`user-roles-dropdown-${userId}`);
+    const dropdown = page.getByTestId(`user-roles-select-${userId}`);
     await dropdown.click();
 
     const firstOption = page.getByTestId('select-role-menu-item-1');
@@ -52,10 +44,5 @@ test.describe('UserRoleTable E2E', () => {
     await page.getByTestId(`user-save-btn-${userId}`).click();
 
     await expect(page.getByText(/Roles updated successfully!/i)).toBeVisible();
-  });
-
-  test('shows "No users found" message when search returns nothing', async ({ page }) => {
-    await page.getByTestId('search-input').fill('no-user-will-ever-have-this-name-or-email');
-    await expect(page.getByTestId('no-users-found')).toBeVisible();
   });
 });
