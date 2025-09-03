@@ -17,14 +17,13 @@ export default defineConfig({
     {
       command: 'npm run start:prod',
       cwd: '../backend',
-      url: 'http://127.0.0.1:3000/health',
       timeout: 120_000,
       reuseExistingServer: true,
       env: {
         NODE_ENV: 'test',
         PORT: '3000',
         DATABASE_TYPE: 'sqlite',
-        DATABASE_DATABASE: ':memory:',
+        DATABASE_DATABASE: './tmp/e2e.sqlite',
         DATABASE_SYNCHRONIZE: 'true',
         DATABASE_LOGGING: 'false',
       },
@@ -41,7 +40,6 @@ export default defineConfig({
       },
     },
   ],
-
   projects: isCI
     ? [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]
     : [

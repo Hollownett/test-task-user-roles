@@ -91,8 +91,11 @@ jobs:
         env:
           NODE_ENV: test
           DATABASE_TYPE: sqlite
-          DATABASE_DATABASE: ":memory:"
-        run: npm run seed:test
+          DATABASE_DATABASE: "./tmp/e2e.sqlite"
+        run: |
+          mkdir -p tmp
+          rm -f ./tmp/e2e.sqlite
+          npm run seed:test
 
       - name: Install (frontend)
         working-directory: ${{ env.FRONTEND_DIR }}
@@ -123,4 +126,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: ${{ env.FRONTEND_DIR }}/playwright-report
+          path: ${{ env.FRONTEND_DIR }}/test-results
