@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom';
 //@ts-ignore
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import UserRoleTable from '../UserRoleTable';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('@/hooks/useUsers', () => ({
   useUsers: jest.fn(),
@@ -84,12 +85,30 @@ describe('UserRoleTable', () => {
     });
 
     render(<UserRoleTable />);
-    const saveButton = await screen.findByTestId('user-save-btn-1');
-    fireEvent.click(saveButton);
 
-    expect(mutateMock).toHaveBeenCalledWith(
-      { userId: 1, roleIds: [2] },
-      expect.any(Object)
-    );
+    const saveButton = await screen.findByTestId('user-save-btn-1');
+    expect(saveButton).toBeDisabled();
+
+    const dropdownWrapper = await screen.findByTestId('user-roles-select-1');
+     await userEvent.click(dropdownWrapper);
+    await waitFor(() => {
+      expect(screen.findByTestId('select-role-menu-item-1')).not.toBeNull();
+    });
+  
+    const adminItem = await screen.findByTestId('select-role-menu-item-1');
+    await userEvent.click(adminItem);
+
+    await userEvent.click(document.body);
+
+    await waitFor(() => {
+       expect(screen.getByTestId('user-save-btn-1')).not.toBeDisabled();
+    });
+
+    await userEvent.click(screen.getByTestId('user-save-btn-1'));
+    expect(mutateMock).toHaveBeenCalled();
+    const [payload] = mutateMock.mock.calls[0];
+    expect(payload.userId).toBe(1);
+    expect(payload.roleIds).toEqual(expect.arrayContaining([1, 2]));
+    expect(payload.roleIds).toHaveLength(2);
   });
 });

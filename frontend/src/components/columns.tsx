@@ -112,6 +112,7 @@ export const makeUserColumns = (): ColumnDef<User, any>[] => [
                   <DropdownMenuCheckboxItem
                     key={o.value}
                     checked={selected.includes(o.value)}
+                    data-testid={`select-role-menu-item-${o.value}`}
                     onCheckedChange={() => {
                       const next = selected.includes(o.value)
                         ? selected.filter(v => v !== o.value)
