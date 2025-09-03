@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useUsers, useUpdateUserRoles } from '../hooks/useUsers'
-import { useRoles } from '../hooks/useRoles'
-import Dropdown from './Dropdown';
+import { useUsers, useUpdateUserRoles } from '../hooks/useUsers';
+import { useRoles } from '../hooks/useRoles';
+import MultiSelect from './Dropdown';
 import { Progress } from './ui/progress';
 import { toast } from 'sonner';
 import {
@@ -28,6 +28,7 @@ interface User { id: number; email: string; name: string; roles: Role[] }
 const UserRoleTable = () => {
   const [selectedRoleIds, setSelectedRoleIds] = useState<Record<number, number[]>>({});
   const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<{ key: 'name' | 'email'; dir: 'asc' | 'desc' } | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -45,19 +46,22 @@ const UserRoleTable = () => {
 
   const saveUserRoles = (userId: number) => {
     if (selectedRoleIds[userId]) {
-      updateUserRolesMutation.mutate({
-        userId,
+      updateUserRolesMutation.mutate(
+        {
+          userId,
         roleIds: selectedRoleIds[userId],
-      }, {
-        onSuccess: () => {
-          toast.success('Roles updated successfully!');
         },
-        onError: (err: any) => {
-          toast.error(`Error updating roles: ${err.message}`);
-        }
-      });
+        {
+          onSuccess: () => {
+            toast.success('Roles updated successfully!');
+          },
+          onError: (err: any) => {
+            toast.error(`Error updating roles: ${err.message}`);
+          },
     }
-  };
+  );
+  }
+};
 
   useEffect(() => {
     if (users) {
@@ -69,20 +73,30 @@ const UserRoleTable = () => {
     }
   }, [users]);
 
-  if (loadingUsers || loadingRoles) return (
-    <div className="py-8 max-w-4xl mx-auto">
-      <Progress />
-    </div>
-  );
+  if (loadingUsers || loadingRoles)
+    return (
+      <div className="py-8 max-w-4xl mx-auto">
+        <Progress />
+      </div>
+    );
 
   if (usersError || rolesError) {
-    return <div className="py-8 text-center text-red-600">Error loading data: {(usersError as any)?.message || (rolesError as any)?.message}</div>
+    return (
+      <div className="py-8 text-center text-red-600">
+        Error loading data: {(usersError as any)?.message || (rolesError as any)?.message}
+      </div>
+    );
   }
 
   const filtered = (users ?? []).filter(u => {
     const q = search.trim().toLowerCase();
     if (q) {
       const matches = u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+      if (!matches) return false;
+    }
+    if (roleFilter.length > 0) {
+      const userRoleIds = u.roles.map(r => r.id);
+      const matches = roleFilter.every(rid => userRoleIds.includes(rid));
       if (!matches) return false;
     }
     return true;
@@ -118,7 +132,20 @@ const UserRoleTable = () => {
           placeholder="Search by name or email"
           value={search}
           data-testid="search-input"
-          onChange={e => { setSearch(e.target.value); setPage(1); }}
+          onChange={e => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
+        <MultiSelect
+          options={roles ? roles.map(r => ({ value: r.id, label: r.name })) : []}
+          value={roleFilter}
+          onChange={(vals: number[]) => {
+            setRoleFilter(vals);
+            setPage(1);
+          }}
+          placeholder="Filter by role"
+          data-testid="role-filter-dropdown"
         />
       </div>
 
@@ -128,9 +155,11 @@ const UserRoleTable = () => {
             <TableHead
               data-testid="column-header-name"
               onClick={() =>
-                setSortBy(s => s && s.key === 'name'
-                  ? { key: 'name', dir: s.dir === 'asc' ? 'desc' : 'asc' }
-                  : { key: 'name', dir: 'asc' })
+                setSortBy(s =>
+                  s && s.key === 'name'
+                    ? { key: 'name', dir: s.dir === 'asc' ? 'desc' : 'asc' }
+                    : { key: 'name', dir: 'asc' }
+                )
               }
               className="cursor-pointer"
             >
@@ -139,9 +168,11 @@ const UserRoleTable = () => {
             <TableHead
               data-testid="column-header-email"
               onClick={() =>
-                setSortBy(s => s && s.key === 'email'
-                  ? { key: 'email', dir: s.dir === 'asc' ? 'desc' : 'asc' }
-                  : { key: 'email', dir: 'asc' })
+                setSortBy(s =>
+                  s && s.key === 'email'
+                    ? { key: 'email', dir: s.dir === 'asc' ? 'desc' : 'asc' }
+                    : { key: 'email', dir: 'asc' }
+                )
               }
               className="cursor-pointer"
             >
@@ -152,30 +183,32 @@ const UserRoleTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paged.length > 0 ? paged.map(user => (
-            <TableRow key={user.id} data-testid={`user-row-${user.id}`}>
-              <TableCell data-testid={`user-name-${user.id}`}>{user.name}</TableCell>
-              <TableCell data-testid={`user-email-${user.id}`}>{user.email}</TableCell>
-              <TableCell data-testid={`user-roles-dropdown-${user.id}`} style={{ width: 300 }}>
-                <Dropdown
-                  options={roles ? roles.map(r => ({ value: r.id, label: r.name })) : []}
-                  value={selectedRoleIds[user.id] || []}
-                  onChange={(vals: number[]) => handleRoleChange(user.id, vals)}
-                  data-testid={`user-roles-select-${user.id}`}
-                />
-              </TableCell>
-              <TableCell>
-                <button
-                  className="bg-gray-900 text-white px-3 py-1 rounded"
-                  onClick={() => saveUserRoles(user.id)}
-                  disabled={updateUserRolesMutation.isLoading}
-                  data-testid={`user-save-btn-${user.id}`}
-                >
-                  Save
-                </button>
-              </TableCell>
-            </TableRow>
-          )) : (
+          {paged.length > 0 ? (
+            paged.map(user => (
+              <TableRow key={user.id} data-testid={`user-row-${user.id}`}>
+                <TableCell data-testid={`user-name-${user.id}`}>{user.name}</TableCell>
+                <TableCell data-testid={`user-email-${user.id}`}>{user.email}</TableCell>
+                <TableCell data-testid={`user-roles-dropdown-${user.id}`} style={{ width: 300 }}>
+                  <MultiSelect
+                    options={roles ? roles.map(r => ({ value: r.id, label: r.name })) : []}
+                    value={selectedRoleIds[user.id] || []}
+                    onChange={(vals: number[]) => handleRoleChange(user.id, vals)}
+                    data-testid={`user-roles-select-${user.id}`}
+                  />
+                </TableCell>
+                <TableCell>
+                  <button
+                    className="bg-gray-900 text-white px-3 py-1 rounded"
+                    onClick={() => saveUserRoles(user.id)}
+                    disabled={updateUserRolesMutation.isLoading}
+                    data-testid={`user-save-btn-${user.id}`}
+                  >
+                    Save
+                  </button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
             <TableRow>
               <TableCell colSpan={4} className="text-center py-4 text-gray-500" data-testid="no-users-found">
                 No users found
@@ -205,17 +238,19 @@ const UserRoleTable = () => {
                 pages.push(totalPages);
               }
 
-              return pages.map((p, idx) => (
+              return pages.map((p, idx) =>
                 p === 'ellipsis' ? (
                   <PaginationItem key={`e-${idx}`}>
                     <PaginationEllipsis />
                   </PaginationItem>
                 ) : (
                   <PaginationItem key={p}>
-                    <PaginationLink isActive={p === pageSafe} onClick={() => setPage(Number(p))}>{p}</PaginationLink>
+                    <PaginationLink isActive={p === pageSafe} onClick={() => setPage(Number(p))}>
+                      {p}
+                    </PaginationLink>
                   </PaginationItem>
                 )
-              ));
+              );
             })()}
             <PaginationItem>
               <PaginationNext onClick={() => setPage(p => Math.min(totalPages, p + 1))} />
@@ -228,9 +263,16 @@ const UserRoleTable = () => {
           <select
             className="border rounded px-2 py-1"
             value={pageSize}
-            onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
+            onChange={e => {
+              setPageSize(Number(e.target.value));
+              setPage(1);
+            }}
           >
-            {[5, 10, 20, 50].map(s => <option key={s} value={s}>{s}</option>)}
+            {[5, 10, 20, 50].map(s => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </div>
       </div>
