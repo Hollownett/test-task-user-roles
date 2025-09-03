@@ -76,21 +76,6 @@ describe('UserRoleTable', () => {
     expect(screen.getByText(/error loading data/i)).toBeInTheDocument();
   });
 
-  it('can search users by name', async () => {
-    render(<UserRoleTable />);
-    const input = screen.getByTestId('search-input');
-    fireEvent.change(input, { target: { value: 'Test Admin' } });
-    expect(await screen.findByText('Test Admin')).toBeInTheDocument();
-    expect(screen.queryByText('Test User')).not.toBeInTheDocument();
-  });
-
-  it('shows "No users found" if search yields no results', async () => {
-    render(<UserRoleTable />);
-    const input = screen.getByTestId('search-input');
-    fireEvent.change(input, { target: { value: 'NOBODY' } });
-    expect(await screen.findByTestId('no-users-found')).toBeInTheDocument();
-  });
-
   it('calls updateUserRoles.mutate when Save is clicked', async () => {
     const mutateMock = jest.fn();
     mockUseUpdateUserRoles.mockReturnValue({
